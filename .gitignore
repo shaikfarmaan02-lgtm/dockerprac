@@ -1,0 +1,14 @@
+# Java / Maven
+Backend/target/
+*.class
+*.log
+
+# Node / Vite
+Frontend/node_modules/
+Frontend/dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
