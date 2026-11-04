@@ -1,0 +1,51 @@
+services:
+  postgresdb:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: studentdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d studentdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - practice-net
+
+  backend:
+    build: ./Backend
+    container_name: student-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdb:5432/studentdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    networks:
+      - practice-net
+
+  frontend:
+    build: ./Frontend
+    container_name: student-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - practice-net
+
+volumes:
+  postgres_data:
+
+networks:
+  practice-net:
+    driver: bridge
